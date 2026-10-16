@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hagat min Indonesia</title>
+
+<style>
+:root {
+  --blue: #1261b5;
+  --dark-blue: #083b78;
+  --light-blue: #eaf4ff;
+  --red: #e63946;
+  --white: #ffffff;
+  --text: #1d2d44;
+  --muted: #63738a;
+  --green: #168b55;
+}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px 12px;
+  background: #f2f7fc;
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 520px;
+  margin: auto;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(8,59,120,.12);
+}
+
+.header {
+  background: linear-gradient(135deg, var(--dark-blue), var(--blue));
+  color: white;
+  text-align: center;
+  padding: 27px 18px;
+  border-bottom: 5px solid var(--red);
+}
+.header h1 { font-size: 25px; margin: 0 0 8px; }
+.header p { font-size: 13px; margin: 0; opacity: .92; }
+
+.content { padding: 22px; }
+
+.language {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 22px;
+}
+.language button {
+  flex: 1;
+  padding: 10px 4px;
+  border: 1px solid #cbd9e8;
+  background: white;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--dark-blue);
+}
+.language button.active {
+  color: white;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 16px 0 7px;
+}
+select, input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #cbd9e8;
+  border-radius: 10px;
+  font-size: 15px;
+  background: white;
+  color: var(--text);
+}
+select:focus, input:focus {
+  outline: 2px solid #9bc8ff;
+  border-color: var(--blue);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.65;
+}
+
+.calculate {
+  width: 100%;
+  margin-top: 23px;
+  padding: 15px;
+  border: none;
+  border-radius: 11px;
+  background: var(--red);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.calculate:hover { filter: brightness(.94); }
+
+.result {
+  display: none;
+  margin-top: 22px;
+  padding: 18px;
+  background: var(--light-blue);
+  border: 1px solid #c9e1ff;
+  border-radius: 13px;
+}
+.result h2 {
+  margin: 0 0 15px;
+  color: var(--dark-blue);
+  font-size: 19px;
+}
+.line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 11px 0;
+  font-size: 14px;
+  align-items: flex-start;
+}
+.line span:last-child {
+  text-align: end;
+  font-weight: bold;
+}
+.total {
+  border-top: 1px solid #b8d5f5;
+  margin-top: 15px;
+  padding-top: 15px;
+  color: var(--dark-blue);
+  font-size: 17px;
+}
+.total-egp {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--blue);
+  text-align: center;
+  margin: 13px 0 5px;
+}
+
+.notice {
+  background: #fff4f4;
+  border-left: 4px solid var(--red);
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.info-card {
+  padding: 13px;
+  margin-top: 15px;
+  background: #f6f9fd;
+  border: 1px solid #dce7f3;
+  border-radius: 11px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+.info-card h3 {
+  color: var(--dark-blue);
+  font-size: 14px;
+  margin: 0 0 7px;
+}
+.info-card p { margin: 0; }
+.info-card .step { margin-top: 7px; }
+
+.whatsapp {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background: var(--green);
+  color: white;
+  padding: 13px;
+  border-radius: 10px;
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 0 20px 22px;
+  line-height: 1.7;
+}
+
+[dir="rtl"] { text-align: right; }
+[dir="rtl"] .notice {
+  border-left: none;
+  border-right: 4px solid var(--red);
+}
+[dir="rtl"] .line span:last-child { text-align: left; }
+[dir="rtl"] .total-egp { text-align: center; }
+[dir="rtl"] .info-card { text-align: right; }
+</style>
+</head>
+
+<body>
+<div class="container" id="app">
+
+  <div class="header">
+    <h1>Hagat min Indonesia</h1>
+    <p id="subtitle">Kalkulator Estimasi Harga Shopee Indonesia – Kairo</p>
+  </div>
+
+  <div class="content">
+
+    <div class="language">
+      <button type="button" class="active" data-lang="id">🇮🇩 Indonesia</button>
+      <button type="button" data-lang="ar">🇪🇬 العربية</button>
+      <button type="button" data-lang="en">🇬🇧 English</button>
+    </div>
+
+    <label id="categoryLabel" for="category">Kategori Produk</label>
+    <select id="category">
+      <option value="skincare">Skincare</option>
+      <option value="normal">Barang Biasa (Non-skincare)</option>
+      <option value="electronics">Elektronik</option>
+    </select>
+
+    <label id="priceLabel" for="price">Harga Produk di Shopee (IDR)</label>
+    <input id="price" type="number" min="1" step="1"
+      placeholder="Contoh: 100000" inputmode="numeric">
+    <div class="hint" id="priceHint">
+      Masukkan harga produk dalam Rupiah, bukan EGP.
+    </div>
+
+    <div id="weightSection">
+      <label id="weightLabel" for="weight">Berat Produk (gram)</label>
+      <input id="weight" type="number" min="0" step="1"
+        placeholder="Contoh: 250" inputmode="numeric">
+      <div class="hint" id="weightHint"></div>
+    </div>
+
+    <button type="button" class="calculate" id="calculate">
+      Hitung Estimasi Harga
+    </button>
+
+    <div class="result" id="result" aria-live="polite">
+      <h2 id="resultTitle">Hasil Perhitungan</h2>
+
+      <div class="line">
+        <span id="rProductLabel">Harga produk</span>
+        <span id="rProduct">-</span>
+      </div>
+      <div class="line">
+        <span id="rFeeLabel">Fee jastip</span>
+        <span id="rFee">-</span>
+      </div>
+      <div class="line">
+        <span id="rHandlingLabel">Biaya aplikasi/handling</span>
+        <span id="rHandling">-</span>
+      </div>
+      <div class="line" id="shippingRow">
+        <span id="rShippingLabel">Ongkir Indonesia–Kairo</span>
+        <span id="rShipping">-</span>
+      </div>
+      <div class="line total">
+        <span id="rTotalLabel">Total estimasi (IDR)</span>
+        <span id="rTotal">-</span>
+      </div>
+
+      <div class="total-egp" id="rEgp">-</div>
+      <div class="hint" id="roundingNote"></div>
+
+      <div class="notice">
+        <strong id="estimateHeading"></strong>
+        <p id="estimateNotice"></p>
+        <p id="electronicsNotice" style="margin-top:8px"></p>
+      </div>
+
+      <a class="whatsapp" id="whatsapp" target="_blank"
+        rel="noopener noreferrer" href="https://wa.me/628211698099">
+        WhatsApp Admin
+      </a>
+    </div>
+
+    <div class="info-card">
+      <h3 id="weightHelpTitle">📦 Cara Mengecek Berat Produk</h3>
+      <p id="weightHelpText"></p>
+    </div>
+
+    <div class="info-card">
+      <h3 id="orderHelpTitle">🛒 Cara Melanjutkan Pemesanan</h3>
+      <p id="orderHelpText"></p>
+    </div>
+
+    <div class="info-card">
+      <h3 id="priceHelpTitle">ℹ️ Informasi Penting</h3>
+      <p id="priceHelpText"></p>
+    </div>
+
+  </div>
+
+  <div class="footer" id="footer"></div>
+</div>
+
+<script>
+const APP_FEE = 5000;
+const IDR_TO_EGP = 0.003;
+const ADMIN_WHATSAPP = "628211698099";
+
+const SHIPPING_PER_KG = {
+  skincare: 200000,
+  normal: 150000
+};
+
+const translations = {
+  id: {
+    subtitle: "Kalkulator Estimasi Harga Shopee Indonesia – Kairo",
+    category: "Kategori Produk",
+    categories: {
+      skincare: "Skincare",
+      normal: "Barang Biasa (Non-skincare)",
+      electronics: "Elektronik"
+    },
+    price: "Harga Produk di Shopee (IDR)",
+    priceHint: "Masukkan harga produk dalam Rupiah, bukan EGP.",
+    weight: "Berat Produk (gram)",
+    weightHint: "Cek cara mengetahui berat produk di keterangan bawah.",
+    calculate: "Hitung Estimasi Harga",
+    resultTitle: "Hasil Perhitungan",
+    product: "Harga produk",
+    fee: "Fee jastip",
+    handling: "Biaya aplikasi/handling",
+    shipping: "Ongkir Indonesia–Kairo",
+    total: "Total estimasi (IDR)",
+    rounding: "Harga dalam EGP dibulatkan ke kelipatan EGP 5 terdekat.",
+    estimateHeading: "⚠️ PERHATIAN: HARGA INI HANYA ESTIMASI!",
+    estimateNotice: "Hasil kalkulator bukan harga final atau harga yang ditentukan admin. Untuk mengetahui harga pasti, silakan hubungi admin. Harga akhir dapat berubah mengikuti kurs, ongkir aktual, dan biaya tambahan jika ada.",
+    electronicsNotice: "🔌 KHUSUS ELEKTRONIK: Hasil kalkulasi di atas BELUM TERMASUK ONGKIR. Hubungi admin untuk mengetahui estimasi ongkir elektronik.",
+    weightTitle: "⚖️ Cara Mengecek Berat Produk",
+    weightHelp: "1. Buka halaman produk di Shopee dan periksa bagian deskripsi untuk mengetahui beratnya. 2. Jika berat tidak tercantum, salin link produk dan tanyakan kepada ChatGPT untuk memperkirakan berat produk setelah dikemas/packing. Hasilnya tetap perkiraan.",
+    orderTitle: "🛒 Cara Melanjutkan Pemesanan",
+    orderHelp: "Setelah selesai menghitung, screenshot hasil kalkulator ini. Kirim screenshot tersebut BESERTA LINK PRODUK SHOPEE kepada admin melalui WhatsApp agar admin dapat memeriksa dan memberikan harga yang ditentukan.",
+    priceTitle: "ℹ️ Informasi Penting",
+    priceHelp: "Biaya aplikasi Rp5.000 dihitung per checkout toko Shopee. Fee jastip dihitung dari harga produk saja, tidak termasuk ongkir dan biaya aplikasi/handling. Bea cukai tidak selalu dikenakan; jika ada, biaya ditanggung pembeli.",
+    footer: "Kalkulator ini untuk estimasi pengiriman Indonesia–Kairo. Biaya pengantaran tambahan mungkin berlaku di luar lokasi pickup Kuliah Banat dan Barakat.",
+    invalidPrice: "Masukkan harga produk yang valid.",
+    invalidWeight: "Masukkan berat produk yang valid dalam gram.",
+    whatsapp: "Hubungi Admin via WhatsApp",
+    whatsappMessage: "Halo admin Hagat min Indonesia! Saya ingin mengecek harga produk Shopee. Saya akan mengirimkan link produk dan screenshot hasil kalkulator.",
+    egpPrefix: "Estimasi dalam EGP",
+    notCalculated: "Belum dihitung"
+  },
+
+  ar: {
+    subtitle: "حاسبة السعر التقديري من شوبي إندونيسيا إلى القاهرة",
+    category: "فئة المنتج",
+    categories: {
+      skincare: "العناية بالبشرة",
+      normal: "منتجات عادية",
+      electronics: "إلكترونيات"
+    },
+    price: "سعر المنتج على شوبي (روبية إندونيسية)",
+    priceHint: "أدخلي سعر المنتج بالروبية الإندونيسية.",
+    weight: "وزن المنتج (جرام)",
+    weightHint: "راجعي التعليمات بالأسفل لمعرفة كيفية تقدير الوزن.",
+    calculate: "احسبي السعر التقديري",
+    resultTitle: "نتيجة الحساب",
+    product: "سعر المنتج",
+    fee: "رسوم خدمة الطلب",
+    handling: "رسوم التطبيق والتجهيز",
+    shipping: "الشحن من إندونيسيا إلى القاهرة",
+    total: "الإجمالي التقديري (روبية)",
+    rounding: "يتم تقريب السعر بالجنيه المصري إلى أقرب 5 جنيهات.",
+    estimateHeading: "⚠️ تنبيه: هذا السعر تقديري فقط!",
+    estimateNotice: "نتيجة الحاسبة ليست السعر النهائي أو السعر المعتمد من الإدارة. لمعرفة السعر المحدد، يُرجى التواصل مع الإدارة. قد يتغير السعر حسب سعر الصرف والشحن الفعلي وأي رسوم إضافية إن وُجدت.",
+    electronicsNotice: "🔌 للإلكترونيات فقط: النتيجة أعلاه لا تشمل تكلفة الشحن. تواصلي مع الإدارة لمعرفة تقدير تكلفة الشحن.",
+    weightTitle: "⚖️ كيفية معرفة وزن المنتج",
+    weightHelp: "١. افتحي صفحة المنتج على شوبي وابحثي عن الوزن في وصف المنتج. ٢. إذا لم يكن الوزن موجوداً، انسخي رابط المنتج واسألي ChatGPT عن الوزن التقديري بعد التغليف. تذكري أن النتيجة تقديرية.",
+    orderTitle: "🛒 كيفية متابعة الطلب",
+    orderHelp: "بعد الحساب، التقطي صورة للشاشة لنتيجة الحاسبة. أرسلي الصورة مع رابط منتج شوبي إلى الإدارة عبر واتساب، حتى تتمكن الإدارة من مراجعة المنتج وتحديد السعر.",
+    priceTitle: "ℹ️ معلومات مهمة",
+    priceHelp: "رسوم التطبيق 5000 روبية لكل عملية شراء من متجر شوبي. تُحسب رسوم الخدمة من سعر المنتج فقط، دون الشحن أو رسوم التطبيق والتجهيز. الجمارك ليست مفروضة دائماً؛ وإذا طُبقت يتحملها المشتري.",
+    footer: "هذه الحاسبة لتقدير الشحن من إندونيسيا إلى القاهرة. قد تُضاف رسوم توصيل خارج مواقع الاستلام في كلية البنات والبركات.",
+    invalidPrice: "من فضلك أدخلي سعر منتج صحيحاً.",
+    invalidWeight: "من فضلك أدخلي الوزن بالجرام بشكل صحيح.",
+    whatsapp: "تواصلي مع الإدارة عبر واتساب",
+    whatsappMessage: "السلام عليكم، أريد معرفة السعر المحدد لمنتج من شوبي إندونيسيا. سأرسل رابط المنتج وصورة نتيجة الحاسبة.",
+    egpPrefix: "السعر التقديري بالجنيه المصري",
+    notCalculated: "غير محسوب"
+  },
+
+  en: {
+    subtitle: "Shopee Indonesia to Cairo Price Estimator",
+    category: "Product Category",
+    categories: {
+      skincare: "Skincare",
+      normal: "Regular Goods",
+      electronics: "Electronics"
+    },
+    price: "Shopee Product Price (IDR)",
+    priceHint: "Enter the product price in Indonesian Rupiah.",
+    weight: "Product Weight (grams)",
+    weightHint: "See the instructions below for how to estimate product weight.",
+    calculate: "Calculate Estimated Price",
+    resultTitle: "Calculation Result",
+    product: "Product price",
+    fee: "Service fee",
+    handling: "App/handling fee",
+    shipping: "Indonesia–Cairo shipping",
+    total: "Estimated total (IDR)",
+    rounding: "EGP is rounded to the nearest multiple of 5.",
+    estimateHeading: "⚠️ PLEASE NOTE: THIS IS ONLY AN ESTIMATE!",
+    estimateNotice: "The calculator result is not the final price or the price set by the admin. Please contact the admin for the confirmed price. The final amount may change due to exchange rates, actual shipping costs, or additional charges.",
+    electronicsNotice: "🔌 ELECTRONICS: The result above DOES NOT INCLUDE SHIPPING. Contact the admin for an estimated electronics shipping cost.",
+    weightTitle: "⚖️ How to Check Product Weight",
+    weightHelp: "1. Open the Shopee product page and check the description for its weight. 2. If no weight is listed, copy the product link and ask ChatGPT to estimate the weight after packaging. The result is still an estimate.",
+    orderTitle: "🛒 How to Continue Your Order",
+    orderHelp: "After calculating, take a screenshot of the calculator result. Send the screenshot TOGETHER WITH THE SHOPEE PRODUCT LINK to the admin via WhatsApp so the admin can review the item and confirm the price.",
+    priceTitle: "ℹ️ Important Information",
+    priceHelp: "The IDR 5,000 app fee applies per Shopee shop checkout. The service fee is calculated from the product price only, excluding shipping and the app/handling fee. Customs are not always charged; if applicable, the buyer pays.",
+    footer: "This calculator estimates shipping from Indonesia to Cairo. Extra delivery fees may apply outside Kuliah Banat and Barakat pickup locations.",
+    invalidPrice: "Please enter a valid product price.",
+    invalidWeight: "Please enter a valid product weight in grams.",
+    whatsapp: "Contact Admin on WhatsApp",
+    whatsappMessage: "Hello Hagat min Indonesia admin! I would like to confirm the price of a Shopee product. I will send the product link and a screenshot of the calculator result.",
+    egpPrefix: "Estimated price in EGP",
+    notCalculated: "Not calculated"
+  }
+};
+
+let currentLang = "id";
+const $ = id => document.getElementById(id);
+
+function moneyIDR(value) {
+  return "Rp " + Math.round(value).toLocaleString("id-ID");
+}
+
+function moneyEGP(value) {
+  return "EGP " + value.toLocaleString("en-US", {
+    maximumFractionDigits: 0
+  });
+}
+
+// Fee is calculated from product price only.
+function getFeeRate(productPrice) {
+  if (productPrice < 20000) return 0.50;
+  if (productPrice <= 50000) return 0.65;
+  if (productPrice <= 150000) return 0.45;
+  if (productPrice <= 500000) return 0.25;
+  return 0.15;
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  const t = translations[lang];
+
+  $("app").dir = lang === "ar" ? "rtl" : "ltr";
+  document.documentElement.lang = lang;
+
+  const labels = {
+    subtitle: t.subtitle,
+    categoryLabel: t.category,
+    priceLabel: t.price,
+    priceHint: t.priceHint,
+    weightLabel: t.weight,
+    weightHint: t.weightHint,
+    calculate: t.calculate,
+    resultTitle: t.resultTitle,
+    rProductLabel: t.product,
+    rFeeLabel: t.fee,
+    rHandlingLabel: t.handling,
+    rShippingLabel: t.shipping,
+    rTotalLabel: t.total,
+    estimateHeading: t.estimateHeading,
+    estimateNotice: t.estimateNotice,
+    electronicsNotice: t.electronicsNotice,
+    weightHelpTitle: t.weightTitle,
+    weightHelpText: t.weightHelp,
+    orderHelpTitle: t.orderTitle,
+    orderHelpText: t.orderHelp,
+    priceHelpTitle: t.priceTitle,
+    priceHelpText: t.priceHelp,
+    footer: t.footer,
+    whatsapp: t.whatsapp
+  };
+
+  Object.entries(labels).forEach(([id, value]) => {
+    $(id).textContent = value;
+  });
+
+  $("category").options[0].textContent = t.categories.skincare;
+  $("category").options[1].textContent = t.categories.normal;
+  $("category").options[2].textContent = t.categories.electronics;
+
+  document.querySelectorAll(".language button").forEach(button => {
+    button.classList.toggle("active", button.dataset.lang === lang);
+  });
+
+  if ($("result").style.display === "block") {
+    calculatePrice();
+  }
+}
+
+function calculatePrice() {
+  const t = translations[currentLang];
+  const category = $("category").value;
+  const rawPrice = Number($("price").value);
+
+  if (!Number.isFinite(rawPrice) || rawPrice <= 0) {
+    alert(t.invalidPrice);
+    $("price").focus();
+    return;
+  }
+
+  // Retains the earlier rule of rounding product price upward to IDR 500.
+  const productPrice = Math.ceil(rawPrice / 500) * 500;
+
+  let shipping = 0;
+
+  if (category !== "electronics") {
+    const weightInput = $("weight").value;
+    const weight = Number(weightInput);
+
+    if (weightInput === "" || !Number.isFinite(weight) || weight < 0) {
+      alert(t.invalidWeight);
+      $("weight").focus();
+      return;
+    }
+
+    shipping = SHIPPING_PER_KG[category] * weight / 1000;
+  }
+
+  const feeRate = getFeeRate(productPrice);
+  const serviceFee = productPrice * feeRate;
+
+  // Total = product + product-only service fee + app fee + shipping.
+  const totalIDR = productPrice + serviceFee + APP_FEE + shipping;
+  const totalEGP = Math.round((totalIDR * IDR_TO_EGP) / 5) * 5;
+
+  $("rProduct").textContent = moneyIDR(productPrice);
+  $("rFee").textContent =
+    moneyIDR(serviceFee) + " (" + (feeRate * 100) + "%)";
+  $("rHandling").textContent = moneyIDR(APP_FEE);
+  $("rShipping").textContent =
+    category === "electronics" ? t.notCalculated : moneyIDR(shipping);
+
+  $("rTotal").textContent = moneyIDR(totalIDR);
+  $("rEgp").textContent = moneyEGP(totalEGP);
+  $("roundingNote").textContent =
+    t.rounding + " " + t.egpPrefix + ": " + moneyEGP(totalEGP);
+
+  $("electronicsNotice").style.display =
+    category === "electronics" ? "block" : "none";
+
+  const message = t.whatsappMessage;
+  $("whatsapp").href =
+    "https://wa.me/" + ADMIN_WHATSAPP +
+    "?text=" + encodeURIComponent(message);
+
+  $("result").style.display = "block";
+  $("result").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+document.querySelectorAll(".language button").forEach(button => {
+  button.addEventListener("click", () => applyLanguage(button.dataset.lang));
+});
+
+$("category").addEventListener("change", () => {
+  $("weightSection").style.display =
+    $("category").value === "electronics" ? "none" : "block";
+  $("result").style.display = "none";
+});
+
+$("calculate").addEventListener("click", calculatePrice);
+
+applyLanguage("id");
+</script>
+</body>
+</html>
